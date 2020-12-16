@@ -21,9 +21,12 @@
         <![CDATA[
         
             
-            This sample demonstrates the basic use of Camera2 API. Check the source code to see how
-            you can display camera preview and take pictures.
-            
+            撮影間隔を入力し適用を押すと撮影間隔が適用されます。
+            また入力し直し、再度適用を押すと上書きされます。
+            フラッシュの初期設定はオンです。
+            画像が保存されない場合は、本体設定で本アプリのストレージ権限を許可してください。
+
+
         
         ]]>
     </string>
