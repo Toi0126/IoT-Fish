@@ -14,8 +14,15 @@
  limitations under the License.
 -->
 <resources>
-    <string name="picture">Picture</string>
+    <string name="picture">開始</string>
     <string name="description_info">Info</string>
     <string name="request_permission">This sample needs camera permission.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="tv_interval">撮影間隔を入力してください。(分）</string>
+    <string name="tv_rep">繰り返し回数を入力してください。</string>
+    <string name="bt_click">適用</string>
+    <string name="bt_click1">フラッシュあり</string>
+    <string name="bt_click2">フラッシュなし</string>
+
+    <string name="tv_interval2">間隔</string>
 </resources>
