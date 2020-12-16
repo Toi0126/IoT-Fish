@@ -20,8 +20,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
@@ -39,9 +41,12 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.icu.util.Calendar;
 import android.media.Image;
 import android.media.ImageReader;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -57,19 +62,32 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
+import android.support.v4.app.ListFragment;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import static android.hardware.camera2.CameraMetadata.CONTROL_MODE_AUTO;
+import static android.hardware.camera2.CameraMetadata.CONTROL_MODE_OFF;
+import static android.widget.Toast.*;
+import static android.widget.Toast.LENGTH_SHORT;
+
 
 public class Camera2BasicFragment extends Fragment
         implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
@@ -80,6 +98,27 @@ public class Camera2BasicFragment extends Fragment
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
+    public int i = 1;
+    EditText input;
+    EditText input2;
+    TextView output;
+    TextView output2;
+    TextView output3;
+    public int inputStr;
+    public int inputStr2;
+    Date date = new Date() ;
+    public int j;
+    public int k;
+    public int num4;
+    public int num5;
+
+
+    int lx[][] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,11,3,4,5,5,5,5,4,2,11,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,2,4,5,6,7,7,6,5,3,2,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,11,3,5,6,7,8,8,7,6,4,3,11,0,0,0,0,0,0,0},{0,0,0,0,0,11,3,5,6,8,9,9,9,8,7,5,3,11,0,0,0,0,0,0,0},{0,0,0,0,0,2,4,6,7,8,9,10,9,9,8,6,4,2,0,0,0,0,0,0,0},{0,0,0,0,0,2,4,6,7,9,9,10,10,9,8,6,5,3,11,0,0,0,0,0,0},{0,0,0,0,0,2,4,5,7,8,9,10,10,9,8,6,5,3,11,0,0,0,0,0,0},{0,0,0,0,0,11,3,5,7,8,9,9,9,9,7,6,4,2,0,0,0,0,0,0,0},{0,0,0,0,0,0,2,4,6,7,8,8,8,7,6,4,2,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,11,3,5,6,7,7,6,6,4,3,11,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,2,3,5,5,5,5,4,3,11,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,11,3,4,4,5,4,4,3,11,0,0,0,0,0,0,0,0,0}};
+
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss") ;
+    SimpleDateFormat sdf = new SimpleDateFormat("HH");
+    SimpleDateFormat sdf2 = new SimpleDateFormat("MM");
+
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -192,6 +231,21 @@ public class Camera2BasicFragment extends Fragment
             mCameraOpenCloseLock.release();
             mCameraDevice = cameraDevice;
             createCameraPreviewSession();
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    Log.d("tag_name", "最終撮影");
+
+                }
+            }, 300);
+
+
+
+
+
         }
 
         @Override
@@ -213,6 +267,9 @@ public class Camera2BasicFragment extends Fragment
         }
 
     };
+
+
+
 
     /**
      * An additional thread for running tasks that shouldn't block the UI.
@@ -244,6 +301,7 @@ public class Camera2BasicFragment extends Fragment
         @Override
         public void onImageAvailable(ImageReader reader) {
             mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+
         }
 
     };
@@ -295,6 +353,8 @@ public class Camera2BasicFragment extends Fragment
                 case STATE_WAITING_LOCK: {
                     Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
                     if (afState == null) {
+
+
                         captureStillPicture();
                     } else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||
                             CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
@@ -303,6 +363,7 @@ public class Camera2BasicFragment extends Fragment
                         if (aeState == null ||
                                 aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
                             mState = STATE_PICTURE_TAKEN;
+
                             captureStillPicture();
                         } else {
                             runPrecaptureSequence();
@@ -317,6 +378,7 @@ public class Camera2BasicFragment extends Fragment
                             aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
                             aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
                         mState = STATE_WAITING_NON_PRECAPTURE;
+
                     }
                     break;
                 }
@@ -326,6 +388,7 @@ public class Camera2BasicFragment extends Fragment
                     if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
                         mState = STATE_PICTURE_TAKEN;
                         captureStillPicture();
+
                     }
                     break;
                 }
@@ -359,7 +422,7 @@ public class Camera2BasicFragment extends Fragment
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
+                    makeText(activity, text, LENGTH_SHORT).show();
                 }
             });
         }
@@ -421,8 +484,114 @@ public class Camera2BasicFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
+
+
+
+        View view = inflater.inflate(R.layout.fragment_camera2_basic, container, false);
+
+
+
+
+
+        input = view.findViewById(R.id.etInterval);
+        input2 = view.findViewById(R.id.etRep);
+
+
+        output =view.findViewById(R.id.tvOutput);
+        output2 =view.findViewById(R.id.tvEndtime);
+        output3 =view.findViewById(R.id.tvLatestphoto);
+
+
+
+        if (null == input) {
+            System.out.println("nullです。");
+        } else {
+             String inputStr = input.getText().toString();
+            output.setText(inputStr);
+
+
+        }
+        if (null == input2) {
+            System.out.println("nullです。");
+        } else {
+            String inputStr2 = input2.getText().toString();
+            output2.setText(inputStr2);
+
+
+        }
+
+
+        Button btClick =view.findViewById(R.id.btClick);
+        HelloListener listener = new HelloListener();
+        btClick.setOnClickListener(listener);
+
+        Button btClick1 =view.findViewById(R.id.btClick1);
+        HelloListener1 listener1 = new HelloListener1();
+        btClick1.setOnClickListener(listener1);
+
+        Button btClick2 =view.findViewById(R.id.btClick2);
+        HelloListener2 listener2 = new HelloListener2();
+        btClick2.setOnClickListener(listener2);
+
+
+
+
+
+
+
+        return view;
+
+
     }
+
+    private class HelloListener implements View.OnClickListener{
+        @Override
+        public void onClick(View view){
+            if (null == input) {
+                System.out.println("nullです。");
+            } else {
+                String inputStr = input.getText().toString();
+                output.setText("撮影間隔：" + inputStr +"分");
+
+
+
+            }
+        }
+    }
+
+    private class HelloListener1 implements View.OnClickListener{
+        @Override
+        public void onClick(View view){
+            if (null == input) {
+                System.out.println("nullです。");
+            } else {
+                String inputStr = input.getText().toString();
+                String flash = "CONTROL_AE_MODE_ON_AUTO_FLASH";
+                j=1;
+                output.setText("撮影間隔：" + inputStr +"分　フラッシュあり");
+                createCameraPreviewSession();
+            }
+        }
+    }
+
+    private class HelloListener2 implements View.OnClickListener{
+        @Override
+        public void onClick(View view){
+            if (null == input) {
+                System.out.println("nullです。");
+            } else {
+                String inputStr = input.getText().toString();
+                String flash = "CONTROL_AE_MODE_ON";
+                j =2;
+                output.setText("撮影間隔：" + inputStr +"分　フラッシュなし");
+                createCameraPreviewSession();
+
+            }
+        }
+    }
+
+
+
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
@@ -431,16 +600,16 @@ public class Camera2BasicFragment extends Fragment
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
-    }
 
     @Override
     public void onResume() {
+
+
         super.onResume();
+
+
         startBackgroundThread();
+
 
         // When the screen is turned off and turned back on, the SurfaceTexture is already
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
@@ -451,14 +620,27 @@ public class Camera2BasicFragment extends Fragment
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
+
+
+
+
+
+
+
     }
 
     @Override
     public void onPause() {
+
         closeCamera();
         stopBackgroundThread();
+
+
         super.onPause();
+
+
     }
+
 
     private void requestCameraPermission() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
@@ -702,9 +884,12 @@ public class Camera2BasicFragment extends Fragment
                             // When the session is ready, we start displaying the preview.
                             mCaptureSession = cameraCaptureSession;
                             try {
-                                // Auto focus should be continuous for camera preview.
+                                // Auto focus should be continuous for camera preview.CONTROL_AF_MODE_OFFにすると無限遠
                                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                                        CaptureRequest.CONTROL_AF_MODE_OFF);
+                                // Use the same AWB modes.CONTROL_AWB_MODE_AUTOにすると自動ホワイトバランス
+                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
+                                        CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT);
                                 // Flash is automatically enabled when necessary.
                                 setAutoFlash(mPreviewRequestBuilder);
 
@@ -819,9 +1004,13 @@ public class Camera2BasicFragment extends Fragment
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(mImageReader.getSurface());
 
-            // Use the same AE and AF modes as the preview.
+            // Use the same AE and AF modes as the preview.CONTROL_AF_MODE_OFFにすると無限遠
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                    CaptureRequest.CONTROL_AF_MODE_OFF);
+            // Use the same AWB modes as the preview.CONTROL_AWB_MODE_AUTOにすると自動ホワイトバランス
+            captureBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
+                    CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT);
+
             setAutoFlash(captureBuilder);
 
             // Orientation
@@ -835,7 +1024,7 @@ public class Camera2BasicFragment extends Fragment
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    showToast("Saved: " + mFile);
+
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
@@ -860,7 +1049,7 @@ public class Camera2BasicFragment extends Fragment
         // We have to take that into account and rotate JPEG properly.
         // For devices with orientation of 90, we simply return our mapping from ORIENTATIONS.
         // For devices with orientation of 270, we need to rotate the JPEG 180 degrees.
-        return (ORIENTATIONS.get(rotation) + mSensorOrientation + 270) % 360;
+        return (ORIENTATIONS.get(rotation) + mSensorOrientation + 180) % 360;
     }
 
     /**
@@ -884,11 +1073,116 @@ public class Camera2BasicFragment extends Fragment
         }
     }
 
+
+    private static void scan(Context context, String volume) {
+        Bundle args = new Bundle();
+        args.putString("volume", volume);
+        context.startService(
+                new Intent().
+                        setComponent(new ComponentName("com.android.providers.media", "com.android.providers.media.MediaScannerService")).
+                        putExtras(args));
+    }
+
+
+
+
+
+    private void takePicture2() {
+        final Date date1 = new Date() ;
+        final SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd-HH-mm") ;
+
+
+
+        final Handler handler = new Handler();
+        final Runnable r = new Runnable() {
+            int count = 0;
+            @Override
+            public void run() {
+                // UIスレッド
+                count++;
+                if (count > 3) { // 3回実行したら終了
+                    Log.d("tag_name", "wait");
+                    Activity activity = getActivity();
+                    scan(activity,"external");
+                    return;
+                }
+                SimpleDateFormat sdf = new SimpleDateFormat("HH");
+                SimpleDateFormat sdf2 = new SimpleDateFormat("MM");
+                String str = sdf.format(date1);
+                String str2 = sdf2.format(date1);
+                int num4 = Integer.parseInt(str);
+                int num5 = Integer.parseInt(str2);
+                j = lx[num5][num4];
+                mFile = new File("/storage/emulated/0/DCIM/", (dateFormat.format(date1) +count+".jpg"));
+                takePicture();
+                Log.d("tag_name", "Saved: " + mFile);
+                output3.setText("最新の撮影：\n"+"/storage/emulated/0/DCIM/"+(dateFormat.format(date1) +count+".jpg"));
+                handler.postDelayed(this, 1500);
+            }
+        };
+        handler.post(r);
+
+
+
+
+
+
+
+    }
+
+
+
     @Override
     public void onClick(View view) {
+
+
+
+
+
+
         switch (view.getId()) {
             case R.id.picture: {
-                takePicture();
+
+                    String inputStr = input.getText().toString();
+                    final int num = Integer.parseInt(inputStr);
+                    String inputStr2 = input2.getText().toString();
+                    final int num2 = Integer.parseInt(inputStr2);
+                    Date date = new Date() ;
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    int min;
+                    min = num * num2 - num;
+                    calendar.add(Calendar.MINUTE, min);
+                    Date d1 = calendar.getTime();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年M月d日H時m分s秒頃") ;
+                    output2.setText("撮影終了予定：\n" + (dateFormat.format(d1)));
+
+
+
+
+                    final Handler handler = new Handler();
+                    final Runnable r = new Runnable() {
+                        int count = 0;
+                        @Override
+                        public void run() {
+                            // UIスレッド
+                            count++;
+                            int num3 = num2-1;
+                            if (count == num3) { // num2回実行したら通知
+                                Log.d("tag_name", "最終撮影");
+                            }
+                            if (count > num2) { // 1440回実行したら終了
+                                return;
+                            }
+                            takePicture2();
+
+
+                            handler.postDelayed(this, 60000*num);
+                        }
+                    };
+                    handler.post(r);
+
+
                 break;
             }
             case R.id.info: {
@@ -904,10 +1198,130 @@ public class Camera2BasicFragment extends Fragment
         }
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+
+        super.onActivityCreated(savedInstanceState);
+        mFile = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_DCIM), (dateFormat.format(date) +".jpg"));
+
+
+    }
+
+
+
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
         if (mFlashSupported) {
-            requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+
+            if (j * 1 == 1){
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH );
+
+            }
+            else if(j*1 == 2) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 4000000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 140);
+                requestBuilder.set(CaptureRequest.LENS_APERTURE, 1.8f);
+
+            }
+            else if(j*1 == 3) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 2000000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 130);
+                requestBuilder.set(CaptureRequest.LENS_APERTURE, 1.8f);
+
+            }
+            else if(j*1 == 4) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 2000000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 115);
+                requestBuilder.set(CaptureRequest.LENS_APERTURE, 1.8f);
+
+            }
+            else if(j*1 == 5) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 1000000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 115);
+
+            }
+            else if(j*1 == 6) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 1000000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 100);
+
+            }
+            else if(j*1 == 7) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 500000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 90);
+
+            }
+            else if(j*1 == 8) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 500000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 80);
+
+            }
+            else if(j*1 == 9) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 250000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 65);
+
+            }
+            else if(j*1 == 10) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 250000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 50);
+
+            }
+            else if(j*1 == 11) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 6060606);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 150);
+
+            }
+            else if(j*1 == 0) {
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF );
+
+                //上からシャッタースピード、ISO値、F値
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 250000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 50);
+
+            }
+
+
+
         }
     }
 
@@ -1032,5 +1446,7 @@ public class Camera2BasicFragment extends Fragment
                     .create();
         }
     }
+
+
 
 }
