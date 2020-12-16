@@ -16,20 +16,49 @@
 
 package com.example.android.camera2basic;
 
+
+import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+
 
 public class CameraActivity extends AppCompatActivity {
 
+
+
+
+
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
+
+
         if (null == savedInstanceState) {
+
+
+
+
+            int j =1;
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, Camera2BasicFragment.newInstance())
                     .commit();
+
+
         }
+
+
+
     }
+
 
 }
