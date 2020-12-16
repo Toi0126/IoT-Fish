@@ -19,6 +19,41 @@
     android:layout_height="match_parent">
 
 
+    <com.example.android.camera2basic.AutoFitTextureView
+        android:id="@+id/texture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/control"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <FrameLayout
+        android:id="@+id/control"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/control_background">
+
+        <Button
+            android:id="@+id/picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/picture" />
+
+        <ImageButton
+            android:id="@+id/info"
+            android:contentDescription="@string/description_info"
+            style="@android:style/Widget.Material.Light.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|right"
+            android:padding="20dp"
+            android:src="@drawable/ic_action_info" />
+
+    </FrameLayout>
+
     <LinearLayout
         android:id="@+id/frame"
         android:layout_width="match_parent"
@@ -31,30 +66,84 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="20dp"
             android:text="@string/tv_interval" />
+
         <EditText
             android:id="@+id/etInterval"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="20dp"
             android:background="#ffffff"
-            android:inputType="number"/>
-        <Button
-            android:id="@+id/btClick"
+            android:inputType="number" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:text="@string/bt_click"/>
+            android:layout_marginTop="20dp"
+            android:text="@string/tv_rep" />
+
+        <EditText
+            android:id="@+id/etRep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#ffffff"
+            android:inputType="number" />
+
+        <Button
+            android:id="@+id/btClick"
+            android:layout_width="144dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="15dp"
+            android:text="@string/bt_click" />
+
+
         <TextView
             android:id="@+id/tvOutput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="15dp"
+            android:background="#ffffff"
+            android:textColor="#000"
             android:text=""
-            android:textSize="25sp"/>
+            android:textSize="23sp" />
+
+        <Button
+            android:id="@+id/btClick1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/bt_click1" />
+
+        <Button
+            android:id="@+id/btClick2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_click2" />
+
+        <TextView
+            android:id="@+id/tvEndtime"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="18dp"
+            android:background="#ffffff"
+            android:textColor="#000"
+            android:text=""
+            android:textSize="23sp" />
+
+        <TextView
+            android:id="@+id/tvLatestphoto"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginTop="20dp"
+            android:background="#ffffff"
+            android:textColor="#000"
+            android:text=""
+            android:textSize="23sp" />
 
 
     </LinearLayout>
+
 
 </RelativeLayout>
