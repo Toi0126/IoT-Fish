@@ -887,6 +887,7 @@ public class Camera2BasicFragment extends Fragment
                                 // Auto focus should be continuous for camera preview.CONTROL_AF_MODE_OFFにすると無限遠
                                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
                                         CaptureRequest.CONTROL_AF_MODE_OFF);
+                                mPreviewRequestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE,0.0f);
                                 // Use the same AWB modes.CONTROL_AWB_MODE_AUTOにすると自動ホワイトバランス
                                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
                                         CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT);
@@ -1007,6 +1008,7 @@ public class Camera2BasicFragment extends Fragment
             // Use the same AE and AF modes as the preview.CONTROL_AF_MODE_OFFにすると無限遠
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
                     CaptureRequest.CONTROL_AF_MODE_OFF);
+            captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE,0.0f);
             // Use the same AWB modes as the preview.CONTROL_AWB_MODE_AUTOにすると自動ホワイトバランス
             captureBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
                     CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT);
