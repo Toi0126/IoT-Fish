@@ -1119,7 +1119,7 @@ public class Camera2BasicFragment extends Fragment
                 takePicture();
                 Log.d("tag_name", "Saved: " + mFile);
                 output3.setText("最新の撮影：\n"+"/storage/emulated/0/DCIM/"+(dateFormat.format(date1) +count+".jpg"));
-                handler.postDelayed(this, 1500);
+                handler.postDelayed(this, 500);
             }
         };
         handler.post(r);
