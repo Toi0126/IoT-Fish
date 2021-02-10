@@ -1295,6 +1295,7 @@ public class Camera2BasicFragment extends Fragment
 
             }
             else if(j*1 == 10) {
+                //最も明るい季節、時間帯の設定
                 requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                         CaptureRequest.CONTROL_AE_MODE_OFF );
 
@@ -1304,21 +1305,29 @@ public class Camera2BasicFragment extends Fragment
 
             }
             else if(j*1 == 11) {
+                //薄暮の設定、薄暮を真っ暗な画像にするにはコメントアウトされた下の設定にする
                 requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                         CaptureRequest.CONTROL_AE_MODE_OFF );
 
                 //上からシャッタースピード、ISO値、F値
                 requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 6060606);
                 requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 150);
+                //上からシャッタースピード、ISO値、F値
+                //requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 250000);
+                //requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 50);
 
             }
             else if(j*1 == 0) {
+                //夜間の設定、夜間を真っ暗な画像にするにはコメントアウトされた下の設定にする
                 requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                         CaptureRequest.CONTROL_AE_MODE_OFF );
 
                 //上からシャッタースピード、ISO値、F値
-                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 250000);
-                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 50);
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 500000000);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 800);
+                //上からシャッタースピード、ISO値、F値
+                //requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, (long) 250000);
+                //requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, 50);
 
             }
 
